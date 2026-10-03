@@ -185,7 +185,7 @@ class _DetailsScreenState extends State<DetailsScreen> {
       context: context,
       builder: (dialogContext) => AlertDialog(
         title: const Text('حذف العنصر؟'),
-        content: Text('هيتم حذف "' + item.name + '".'),
+        content: Text('هيتم حذف "${item.name}".'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext, false),
