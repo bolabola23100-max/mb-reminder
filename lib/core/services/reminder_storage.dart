@@ -26,7 +26,7 @@ class ReminderStorage {
         final name = legacyNames[index].trim();
         if (name.isEmpty) continue;
 
-        final id = `migrated_${DateTime.now().microsecondsSinceEpoch}_$index`;
+        final id = 'migrated_${DateTime.now().microsecondsSinceEpoch}_$index';
         final folder = FolderModel(id: id, name: name);
         migrated.add(folder);
 
@@ -71,12 +71,12 @@ class ReminderStorage {
       if (value is Map) {
         return DetailsModel.fromMap(
           Map<dynamic, dynamic>.from(value),
-          fallbackId: `legacy_${DateTime.now().microsecondsSinceEpoch}_$index`,
+          fallbackId: 'legacy_${DateTime.now().microsecondsSinceEpoch}_$index',
         );
       }
 
       return DetailsModel(
-        id: `invalid_${DateTime.now().microsecondsSinceEpoch}_$index`,
+        id: 'invalid_${DateTime.now().microsecondsSinceEpoch}_$index',
         name: '',
         link: '',
         description: '',
