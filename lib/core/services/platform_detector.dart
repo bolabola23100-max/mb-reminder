@@ -55,7 +55,7 @@ class PlatformDetector {
     if (value.isEmpty) return PlatformType.unknown;
 
     if (!value.contains('://')) {
-      value = 'https://' + value;
+      value = 'https://$value';
     }
 
     final uri = Uri.tryParse(value);
