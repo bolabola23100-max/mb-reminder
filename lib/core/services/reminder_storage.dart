@@ -9,10 +9,10 @@ class ReminderStorage {
   static Box get box => Hive.box(boxName);
 
   static String foldersKey(PlatformType platform) =>
-      platform.storageKey + '_folders';
+      `${platform.storageKey}_folders`;
 
   static String itemsKey(PlatformType platform, String folderId) =>
-      'folder_' + platform.storageKey + '_' + folderId;
+      `${'folder_'}${platform.storageKey}_$folderId`;
 
   static Future<List<FolderModel>> loadFolders(PlatformType platform) async {
     final key = foldersKey(platform);
@@ -26,14 +26,11 @@ class ReminderStorage {
         final name = legacyNames[index].trim();
         if (name.isEmpty) continue;
 
-        final id = 'migrated_' +
-            DateTime.now().microsecondsSinceEpoch.toString() +
-            '_' +
-            index.toString();
+        final id = `migrated_${DateTime.now().microsecondsSinceEpoch}_$index`;
         final folder = FolderModel(id: id, name: name);
         migrated.add(folder);
 
-        final legacyItems = box.get('folder_' + name);
+        final legacyItems = box.get(`folder_$name`);
         if (legacyItems != null) {
           await box.put(itemsKey(platform, id), legacyItems);
         }
@@ -74,18 +71,12 @@ class ReminderStorage {
       if (value is Map) {
         return DetailsModel.fromMap(
           Map<dynamic, dynamic>.from(value),
-          fallbackId: 'legacy_' +
-              DateTime.now().microsecondsSinceEpoch.toString() +
-              '_' +
-              index.toString(),
+          fallbackId: `legacy_${DateTime.now().microsecondsSinceEpoch}_$index`,
         );
       }
 
       return DetailsModel(
-        id: 'invalid_' +
-            DateTime.now().microsecondsSinceEpoch.toString() +
-            '_' +
-            index.toString(),
+        id: `invalid_${DateTime.now().microsecondsSinceEpoch}_$index`,
         name: '',
         link: '',
         description: '',
