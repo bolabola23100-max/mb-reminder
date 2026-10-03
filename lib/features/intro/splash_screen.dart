@@ -32,7 +32,7 @@ class _SplashScreenState extends State<SplashScreen> {
           AppIcons.mb,
           height: 250,
           width: 250,
-          errorBuilder: (_, __, ___) =>
+          errorBuilder: (_, _, _) =>
               const Icon(Icons.bookmark_rounded, size: 100),
         ),
       ),
