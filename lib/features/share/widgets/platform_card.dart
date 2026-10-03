@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:mb_reminder/core/constants/app_colors.dart';
 
 class PlatformCard extends StatelessWidget {
   final String title;
@@ -8,6 +7,7 @@ class PlatformCard extends StatelessWidget {
   final VoidCallback onTap;
 
   const PlatformCard({
+    super.key,
     required this.title,
     required this.icon,
     required this.onTap,
@@ -15,23 +15,32 @@ class PlatformCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
+
     return Card(
       child: ListTile(
         leading: SvgPicture.asset(
           icon,
           width: 40,
           height: 40,
-          colorFilter: const ColorFilter.mode(AppColors.black, BlendMode.srcIn),
+          colorFilter: ColorFilter.mode(
+            colors.onSurface,
+            BlendMode.srcIn,
+          ),
         ),
         title: Text(
           title,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 15,
             fontWeight: FontWeight.bold,
-            color: AppColors.black,
+            color: colors.onSurface,
           ),
         ),
-        trailing: const Icon(Icons.arrow_forward_ios),
+        trailing: Icon(
+          Icons.arrow_forward_ios,
+          color: colors.onSurface,
+          size: 18,
+        ),
         onTap: onTap,
       ),
     );
