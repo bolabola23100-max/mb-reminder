@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:mb_reminder/core/constants/app_icons.dart';
 import 'package:mb_reminder/core/services/platform_detector.dart';
 import 'package:mb_reminder/core/services/reminder_storage.dart';
 import 'package:mb_reminder/core/widgets/card_widget.dart';
