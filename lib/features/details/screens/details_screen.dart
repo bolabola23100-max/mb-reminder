@@ -162,7 +162,7 @@ class _DetailsScreenState extends State<DetailsScreen> {
 
                 await _saveItems();
 
-                if (!mounted) return;
+                if (!dialogContext.mounted) return;
                 Navigator.pop(dialogContext);
               },
               child: Text(
