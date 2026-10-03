@@ -13,10 +13,13 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
-    Future.delayed(const Duration(seconds: 3), () {
+
+    Future.delayed(const Duration(milliseconds: 900), () {
+      if (!mounted) return;
+
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => const HomeScreen()),
+        MaterialPageRoute(builder: (_) => const HomeScreen()),
       );
     });
   }
@@ -24,7 +27,15 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Center(child: Image.asset(AppIcons.mb, height: 250, width: 250)),
+      body: Center(
+        child: Image.asset(
+          AppIcons.mb,
+          height: 250,
+          width: 250,
+          errorBuilder: (_, __, ___) =>
+              const Icon(Icons.bookmark_rounded, size: 100),
+        ),
+      ),
     );
   }
 }
