@@ -9,10 +9,10 @@ class ReminderStorage {
   static Box get box => Hive.box(boxName);
 
   static String foldersKey(PlatformType platform) =>
-      `${platform.storageKey}_folders`;
+      '${platform.storageKey}_folders';
 
   static String itemsKey(PlatformType platform, String folderId) =>
-      `${'folder_'}${platform.storageKey}_$folderId`;
+      'folder_${platform.storageKey}_$folderId';
 
   static Future<List<FolderModel>> loadFolders(PlatformType platform) async {
     final key = foldersKey(platform);
@@ -30,7 +30,7 @@ class ReminderStorage {
         final folder = FolderModel(id: id, name: name);
         migrated.add(folder);
 
-        final legacyItems = box.get(`folder_$name`);
+        final legacyItems = box.get('folder_$name');
         if (legacyItems != null) {
           await box.put(itemsKey(platform, id), legacyItems);
         }
