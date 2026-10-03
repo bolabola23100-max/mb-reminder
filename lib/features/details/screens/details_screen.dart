@@ -68,7 +68,7 @@ class _DetailsScreenState extends State<DetailsScreen> {
 
     var text = value.trim();
     if (!text.contains('://')) {
-      text = 'https://' + text;
+      text = 'https://$text';
     }
 
     final uri = Uri.tryParse(text);
@@ -84,7 +84,7 @@ class _DetailsScreenState extends State<DetailsScreen> {
 
   String _normalizeUrl(String value) {
     final text = value.trim();
-    return text.contains('://') ? text : 'https://' + text;
+    return text.contains('://') ? text : 'https://$text';
   }
 
   Future<void> _showItemDialog({
@@ -228,7 +228,7 @@ class _DetailsScreenState extends State<DetailsScreen> {
         onDelete: _deleteItem,
       ),
       floatingActionButton: FloatingActionButton(
-        heroTag: 'items_' + widget.folder.id + '_fab',
+        heroTag: 'items_${widget.folder.id}_fab',
         backgroundColor: colors.primary,
         onPressed: () => _showItemDialog(),
         child: Icon(Icons.add, color: colors.onPrimary),
