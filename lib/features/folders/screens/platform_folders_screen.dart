@@ -142,7 +142,7 @@ class _PlatformFoldersScreenState extends State<PlatformFoldersScreen> {
       context: context,
       builder: (dialogContext) => AlertDialog(
         title: const Text('حذف الملف؟'),
-        content: Text('هيتم حذف "' + folder.name + '" وكل اللينكات اللي جواه.'),
+        content: Text('هيتم حذف "${folder.name}" وكل اللينكات اللي جواه.'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext, false),
