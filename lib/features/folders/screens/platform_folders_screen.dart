@@ -23,6 +23,7 @@ class PlatformFoldersScreen extends StatefulWidget {
 class _PlatformFoldersScreenState extends State<PlatformFoldersScreen> {
   List<FolderModel> folders = [];
   final controller = TextEditingController();
+  String? pendingSharedLink;
 
   String get title => widget.platform.displayName;
   String get icon => widget.platform.iconPath;
@@ -30,6 +31,7 @@ class _PlatformFoldersScreenState extends State<PlatformFoldersScreen> {
   @override
   void initState() {
     super.initState();
+    pendingSharedLink = widget.sharedLink;
     _loadFolders();
   }
 
@@ -118,6 +120,15 @@ class _PlatformFoldersScreenState extends State<PlatformFoldersScreen> {
     final cleanName = name.trim();
     if (cleanName.isEmpty) return;
 
+    final duplicate = folders.any(
+      (item) => item.id != folder.id &&
+          item.name.toLowerCase() == cleanName.toLowerCase(),
+    );
+    if (duplicate) {
+      _showMessage('الاسم موجود بالفعل');
+      return;
+    }
+
     setState(() {
       final index = folders.indexWhere((item) => item.id == folder.id);
       if (index != -1) {
@@ -160,13 +171,16 @@ class _PlatformFoldersScreenState extends State<PlatformFoldersScreen> {
   }
 
   void _openFolder(FolderModel folder) {
+    final link = pendingSharedLink;
+    pendingSharedLink = null;
+
     Navigator.push(
       context,
       MaterialPageRoute(
         builder: (_) => DetailsScreen(
           platform: widget.platform,
           folder: folder,
-          sharedLink: widget.sharedLink,
+          sharedLink: link,
         ),
       ),
     );
