@@ -11,51 +11,64 @@ import 'package:mb_reminder/features/share/screens/share_platform_screen.dart';
 
 const MethodChannel shareChannel = MethodChannel('mb_reminder/share');
 
-void main() async {
+final ValueNotifier<String?> sharedTextNotifier = ValueNotifier<String?>(null);
+
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   await Hive.initFlutter();
   await Hive.openBox('mb_reminder_box');
   await ThemeController.load();
-  final sharedText = await shareChannel.invokeMethod<String>('getSharedText');
 
-  PlatformType platform = PlatformType.unknown;
+  final initialSharedText =
+      await shareChannel.invokeMethod<String>('getSharedText');
 
-  if (sharedText != null) {
-    platform = PlatformDetector.detect(sharedText);
-
-    log('🔗 Shared Link: $sharedText');
-    log('📱 Platform: $platform');
+  if (initialSharedText != null && initialSharedText.trim().isNotEmpty) {
+    sharedTextNotifier.value = initialSharedText.trim();
+    log('Shared link received on launch');
   }
 
-  runApp(MainApp(sharedText: sharedText, platform: platform));
+  shareChannel.setMethodCallHandler((call) async {
+    if (call.method != 'sharedText') return;
+
+    final value = call.arguments?.toString().trim();
+    if (value == null || value.isEmpty) return;
+
+    sharedTextNotifier.value = value;
+    log('Shared link received while app is running');
+  });
+
+  runApp(const MainApp());
 }
 
 class MainApp extends StatelessWidget {
-  final String? sharedText;
-  final PlatformType platform;
-
-  const MainApp({
-    super.key,
-    this.sharedText,
-    this.platform = PlatformType.unknown,
-  });
+  const MainApp({super.key});
 
   @override
   Widget build(BuildContext context) {
     return ValueListenableBuilder<ThemeMode>(
       valueListenable: ThemeController.themeMode,
       builder: (context, themeMode, child) {
-        return MaterialApp(
-          debugShowCheckedModeBanner: false,
+        return ValueListenableBuilder<String?>(
+          valueListenable: sharedTextNotifier,
+          builder: (context, sharedText, child) {
+            final platform = sharedText == null
+                ? PlatformType.unknown
+                : PlatformDetector.detect(sharedText);
 
-          theme: AppTheme.light,
-          darkTheme: AppTheme.dark,
-          themeMode: themeMode,
-
-          home: sharedText != null
-              ? SharePlatformScreen(sharedLink: sharedText!)
-              : SplashScreen(),
+            return MaterialApp(
+              debugShowCheckedModeBanner: false,
+              theme: AppTheme.light,
+              darkTheme: AppTheme.dark,
+              themeMode: themeMode,
+              home: sharedText == null
+                  ? const SplashScreen()
+                  : SharePlatformScreen(
+                      sharedLink: sharedText,
+                      detectedPlatform: platform,
+                    ),
+            );
+          },
         );
       },
     );
