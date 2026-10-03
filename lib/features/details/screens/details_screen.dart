@@ -1,171 +1,208 @@
 import 'package:flutter/material.dart';
-import 'package:hive_flutter/hive_flutter.dart';
+import 'package:mb_reminder/core/services/platform_detector.dart';
+import 'package:mb_reminder/core/services/reminder_storage.dart';
 import 'package:mb_reminder/core/widgets/details_item.dart';
 import 'package:mb_reminder/features/details/widgets/details_model.dart';
+import 'package:mb_reminder/features/folders/widgets/folder_model.dart';
 
 class DetailsScreen extends StatefulWidget {
-  final String item;
+  final PlatformType platform;
+  final FolderModel folder;
   final String? sharedLink;
 
-  const DetailsScreen({super.key, required this.item, this.sharedLink});
+  const DetailsScreen({
+    super.key,
+    required this.platform,
+    required this.folder,
+    this.sharedLink,
+  });
 
   @override
   State<DetailsScreen> createState() => _DetailsScreenState();
 }
 
 class _DetailsScreenState extends State<DetailsScreen> {
-  final Box box = Hive.box('mb_reminder_box');
-
   List<DetailsModel> items = [];
 
-  final TextEditingController linkController = TextEditingController();
-  final TextEditingController nameController = TextEditingController();
-  final TextEditingController descController = TextEditingController();
-
-  final _formKey = GlobalKey<FormState>();
+  final linkController = TextEditingController();
+  final nameController = TextEditingController();
+  final descController = TextEditingController();
+  final formKey = GlobalKey<FormState>();
 
   @override
   void initState() {
     super.initState();
-
     _loadItems();
 
     if (widget.sharedLink != null) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        showAddDialog();
-
-        linkController.text = widget.sharedLink!;
+        if (!mounted) return;
+        _showItemDialog(initialLink: widget.sharedLink);
       });
     }
   }
 
-  void _loadItems() {
-    final List? rawItems = box.get('folder_${widget.item}');
+  Future<void> _loadItems() async {
+    final loaded = await ReminderStorage.loadItems(
+      widget.platform,
+      widget.folder.id,
+    );
 
-    if (rawItems != null) {
-      setState(() {
-        items = rawItems
-            .map(
-              (e) => DetailsModel(
-                name: e['name'] ?? '',
-                link: e['link'] ?? '',
-                description: e['description'] ?? '',
-              ),
-            )
-            .toList();
-      });
+    if (!mounted) return;
+    setState(() => items = loaded);
+
+    // Saves generated IDs for old records so the migration is completed.
+    await _saveItems();
+  }
+
+  Future<void> _saveItems() {
+    return ReminderStorage.saveItems(
+      widget.platform,
+      widget.folder.id,
+      items,
+    );
+  }
+
+  String? _validateAndNormalizeUrl(String? value) {
+    if (value == null || value.trim().isEmpty) return 'اللينك مطلوب';
+
+    var text = value.trim();
+    if (!text.contains('://')) {
+      text = 'https://' + text;
     }
+
+    final uri = Uri.tryParse(text);
+    if (uri == null ||
+        (uri.scheme != 'http' && uri.scheme != 'https') ||
+        uri.host.isEmpty ||
+        uri.host.contains(' ')) {
+      return 'ادخل لينك صحيح';
+    }
+
+    return null;
   }
 
-  void _saveItems() {
-    final listToSave = items
-        .map(
-          (e) => {'name': e.name, 'link': e.link, 'description': e.description},
-        )
-        .toList();
-
-    box.put('folder_${widget.item}', listToSave);
+  String _normalizeUrl(String value) {
+    final text = value.trim();
+    return text.contains('://') ? text : 'https://' + text;
   }
 
-  void showAddDialog() {
-    showDialog(
+  Future<void> _showItemDialog({
+    DetailsModel? item,
+    String? initialLink,
+  }) async {
+    linkController.text = initialLink ?? item?.link ?? '';
+    nameController.text = item?.name ?? '';
+    descController.text = item?.description ?? '';
+
+    await showDialog<void>(
       context: context,
-      builder: (context) {
-        final colors = Theme.of(context).colorScheme;
+      builder: (dialogContext) {
+        final colors = Theme.of(dialogContext).colorScheme;
 
         return AlertDialog(
-          title: const Text('إضافة عنصر'),
-
+          title: Text(item == null ? 'إضافة عنصر' : 'تعديل العنصر'),
           content: Form(
-            key: _formKey,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                TextFormField(
-                  controller: linkController,
-                  decoration: const InputDecoration(hintText: 'اللينك'),
-                  validator: (value) {
-                    if (value == null || value.trim().isEmpty) {
-                      return 'اللينك مطلوب';
-                    }
-
-                    String urlText = value.trim();
-
-                    if (!urlText.startsWith('http://') &&
-                        !urlText.startsWith('https://')) {
-                      urlText = 'https://$urlText';
-                    }
-
-                    final uri = Uri.tryParse(urlText);
-
-                    if (uri == null ||
-                        !uri.hasAbsolutePath ||
-                        !uri.host.contains('.')) {
-                      return 'ادخل لينك صحيح';
-                    }
-
-                    return null;
-                  },
-                ),
-
-                TextFormField(
-                  controller: nameController,
-                  decoration: const InputDecoration(hintText: 'الاسم'),
-                  validator: (value) {
-                    if (value == null || value.trim().isEmpty) {
-                      return 'الاسم مطلوب';
-                    }
-
-                    return null;
-                  },
-                ),
-
-                TextField(
-                  controller: descController,
-                  decoration: const InputDecoration(hintText: 'الديسكربشن'),
-                ),
-              ],
+            key: formKey,
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  TextFormField(
+                    controller: linkController,
+                    keyboardType: TextInputType.url,
+                    decoration: const InputDecoration(hintText: 'اللينك'),
+                    validator: _validateAndNormalizeUrl,
+                  ),
+                  TextFormField(
+                    controller: nameController,
+                    decoration: const InputDecoration(hintText: 'الاسم'),
+                    validator: (value) {
+                      if (value == null || value.trim().isEmpty) {
+                        return 'الاسم مطلوب';
+                      }
+                      return null;
+                    },
+                  ),
+                  TextField(
+                    controller: descController,
+                    decoration: const InputDecoration(hintText: 'الديسكربشن'),
+                    maxLines: 3,
+                  ),
+                ],
+              ),
             ),
           ),
-
           actions: [
             TextButton(
-              onPressed: () {
-                if (!_formKey.currentState!.validate()) {
-                  return;
-                }
+              onPressed: () => Navigator.pop(dialogContext),
+              child: const Text('إلغاء'),
+            ),
+            FilledButton(
+              onPressed: () async {
+                if (!formKey.currentState!.validate()) return;
 
-                String finalLink = linkController.text.trim();
-
-                if (!finalLink.startsWith('http://') &&
-                    !finalLink.startsWith('https://')) {
-                  finalLink = 'https://$finalLink';
-                }
+                final updated = DetailsModel(
+                  id: item?.id ??
+                      DateTime.now().microsecondsSinceEpoch.toString(),
+                  link: _normalizeUrl(linkController.text),
+                  name: nameController.text.trim(),
+                  description: descController.text.trim(),
+                );
 
                 setState(() {
-                  items.add(
-                    DetailsModel(
-                      link: finalLink,
-                      name: nameController.text.trim(),
-                      description: descController.text.trim(),
-                    ),
-                  );
+                  if (item == null) {
+                    items.add(updated);
+                  } else {
+                    final index =
+                        items.indexWhere((entry) => entry.id == item.id);
+                    if (index != -1) items[index] = updated;
+                  }
                 });
 
-                _saveItems();
+                await _saveItems();
 
-                nameController.clear();
-                descController.clear();
-                linkController.clear();
-
-                Navigator.pop(context);
+                if (!mounted) return;
+                Navigator.pop(dialogContext);
               },
-              child: Text('إضافة', style: TextStyle(color: colors.primary)),
+              child: Text(
+                item == null ? 'إضافة' : 'حفظ',
+                style: TextStyle(color: colors.onPrimary),
+              ),
             ),
           ],
         );
       },
     );
+
+    linkController.clear();
+    nameController.clear();
+    descController.clear();
+  }
+
+  Future<void> _deleteItem(DetailsModel item) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('حذف العنصر؟'),
+        content: Text('هيتم حذف "' + item.name + '".'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext, false),
+            child: const Text('إلغاء'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(dialogContext, true),
+            child: const Text('حذف'),
+          ),
+        ],
+      ),
+    );
+
+    if (!mounted || confirmed != true) return;
+
+    setState(() => items.removeWhere((entry) => entry.id == item.id));
+    await _saveItems();
   }
 
   @override
@@ -173,7 +210,6 @@ class _DetailsScreenState extends State<DetailsScreen> {
     linkController.dispose();
     nameController.dispose();
     descController.dispose();
-
     super.dispose();
   }
 
@@ -183,20 +219,19 @@ class _DetailsScreenState extends State<DetailsScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        leading: const BackButton(),
-        title: Center(child: Text(widget.item)),
+        title: Text(widget.folder.name),
+        centerTitle: true,
       ),
-
-      body: DetailsItem(items: items),
-
+      body: DetailsItem(
+        items: items,
+        onEdit: (item) => _showItemDialog(item: item),
+        onDelete: _deleteItem,
+      ),
       floatingActionButton: FloatingActionButton(
-        heroTag: 'item_fab',
-
+        heroTag: 'items_' + widget.folder.id + '_fab',
         backgroundColor: colors.primary,
-
-        onPressed: showAddDialog,
-
-        child: Icon(Icons.add, color: colors.surface),
+        onPressed: () => _showItemDialog(),
+        child: Icon(Icons.add, color: colors.onPrimary),
       ),
     );
   }
