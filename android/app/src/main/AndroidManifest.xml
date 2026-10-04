@@ -28,10 +28,10 @@
             </intent-filter>
         </activity>
 
-        <!-- Google test AdMob App ID. Replace with MB Reminder's AdMob App ID before production. -->
+        <!-- MB Reminder AdMob App ID -->
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"
-            android:value="ca-app-pub-3940256099942544~3347511713"/>
+            android:value="ca-app-pub-9304585087563779~4822568871"/>
 
         <meta-data
             android:name="flutterEmbedding"
