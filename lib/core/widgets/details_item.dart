@@ -98,19 +98,51 @@ class DetailsItem extends StatelessWidget {
                         ),
                       ),
                       onPressed: () async {
-                        final url = Uri.tryParse(item.link);
-                        if (url == null || !await canLaunchUrl(url)) {
+                        var link = item.link.trim();
+                        if (link.isEmpty) {
                           if (!context.mounted) return;
                           ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text('مش قادر أفتح اللينك')),
+                            const SnackBar(content: Text('اللينك فاضي')),
                           );
                           return;
                         }
 
-                        await launchUrl(
-                          url,
-                          mode: LaunchMode.externalApplication,
-                        );
+                        if (!link.contains('://')) {
+                          link = 'https://$link';
+                        }
+
+                        final url = Uri.tryParse(link);
+                        if (url == null ||
+                            (url.scheme != 'http' && url.scheme != 'https') ||
+                            url.host.isEmpty) {
+                          if (!context.mounted) return;
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text('اللينك غير صحيح')),
+                          );
+                          return;
+                        }
+
+                        try {
+                          final launched = await launchUrl(
+                            url,
+                            mode: LaunchMode.externalApplication,
+                          );
+
+                          if (!launched && context.mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text('مش قادر أفتح اللينك'),
+                              ),
+                            );
+                          }
+                        } catch (_) {
+                          if (!context.mounted) return;
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text('مش قادر أفتح اللينك'),
+                            ),
+                          );
+                        }
                       },
                       icon: const Icon(Icons.link, size: 18),
                       label: const Text('فتح اللينك'),
