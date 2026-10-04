@@ -3,6 +3,8 @@ import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
 class AdsService {
+  static const bool adsEnabled = true;
+
   static const String _folderAddsKey = 'ads_folder_adds';
   static const String _linkAddsKey = 'ads_link_adds';
   static const String _linkOpensKey = 'ads_link_opens';
@@ -15,7 +17,7 @@ class AdsService {
   static bool _loadingInterstitial = false;
 
   static Future<void> initialize() async {
-    if (_initialized) return;
+    if (!adsEnabled || _initialized) return;
     _initialized = true;
 
     await MobileAds.instance.initialize();
@@ -25,25 +27,29 @@ class AdsService {
   static Box get _box => Hive.box('mb_reminder_box');
 
   static Future<void> recordFolderAdded() async {
+    if (!adsEnabled) return;
     await _record(_folderAddsKey);
   }
 
   static Future<void> recordLinkAdded() async {
+    if (!adsEnabled) return;
     await _record(_linkAddsKey);
   }
 
   static Future<void> recordLinkOpened() async {
+    if (!adsEnabled) return;
     await _record(_linkOpensKey);
   }
 
   static Future<void> _record(String key) async {
+    if (!adsEnabled) return;
     final count = (_box.get(key, defaultValue: 0) as int) + 1;
     await _box.put(key, count);
     await _tryShowFor(key, count);
   }
 
   static Future<void> _tryShowFor(String key, int count) async {
-    if (count < _triggerEvery) return;
+    if (!adsEnabled || count < _triggerEvery) return;
 
     final lastShown = _box.get(_lastInterstitialKey);
     if (lastShown is int) {
@@ -94,7 +100,9 @@ class AdsService {
   }
 
   static void _loadInterstitial() {
-    if (_loadingInterstitial || _interstitialAd != null) return;
+    if (!adsEnabled || _loadingInterstitial || _interstitialAd != null) {
+      return;
+    }
     _loadingInterstitial = true;
 
     InterstitialAd.load(
