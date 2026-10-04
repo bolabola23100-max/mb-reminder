@@ -15,7 +15,7 @@ if (keystorePropertiesFile.exists()) {
 }
 
 android {
-    namespace = "com.example.mb_reminder"
+    namespace = "com.bola.mbreminder"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
 
@@ -29,28 +29,31 @@ android {
     }
 
     defaultConfig {
-        applicationId = "com.example.mb_reminder"
+        applicationId = "com.bola.mbreminder"
         minSdk = flutter.minSdkVersion
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
         versionName = flutter.versionName
     }
 
-    if (keystorePropertiesFile.exists()) {
-        signingConfigs {
-            create("release") {
-                keyAlias = keystoreProperties.getProperty("keyAlias")
-                keyPassword = keystoreProperties.getProperty("keyPassword")
-                storeFile = keystoreProperties.getProperty("storeFile")
-                    ?.let { rootProject.file(it) }
-                storePassword = keystoreProperties.getProperty("storePassword")
+    signingConfigs {
+        create("release") {
+            if (!keystorePropertiesFile.exists()) {
+                throw GradleException(
+                    "Missing android/key.properties. Add the correct release/upload keystore before building a release APK/AAB."
+                )
             }
+            keyAlias = keystoreProperties.getProperty("keyAlias")
+            keyPassword = keystoreProperties.getProperty("keyPassword")
+            storeFile = keystoreProperties.getProperty("storeFile")
+                ?.let { rootProject.file(it) }
+            storePassword = keystoreProperties.getProperty("storePassword")
         }
+    }
 
-        buildTypes {
-            release {
-                signingConfig = signingConfigs.getByName("release")
-            }
+    buildTypes {
+        release {
+            signingConfig = signingConfigs.getByName("release")
         }
     }
 }
