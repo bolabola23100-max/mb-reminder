@@ -21,8 +21,6 @@ class CardWidget extends StatelessWidget {
     final colors = Theme.of(context).colorScheme;
 
     return GridView.builder(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
       padding: const EdgeInsets.only(bottom: 100),
       gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
         maxCrossAxisExtent: 220,
