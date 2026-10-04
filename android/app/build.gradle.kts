@@ -1,17 +1,7 @@
-import java.io.FileInputStream
-import java.util.Properties
-
 plugins {
     id("com.android.application")
     id("kotlin-android")
     id("dev.flutter.flutter-gradle-plugin")
-}
-
-val keystoreProperties = Properties()
-val keystorePropertiesFile = rootProject.file("key.properties")
-
-if (keystorePropertiesFile.exists()) {
-    keystoreProperties.load(FileInputStream(keystorePropertiesFile))
 }
 
 android {
@@ -36,24 +26,9 @@ android {
         versionName = flutter.versionName
     }
 
-    signingConfigs {
-        create("release") {
-            if (!keystorePropertiesFile.exists()) {
-                throw GradleException(
-                    "Missing android/key.properties. Add the correct release/upload keystore before building a release APK/AAB."
-                )
-            }
-            keyAlias = keystoreProperties.getProperty("keyAlias")
-            keyPassword = keystoreProperties.getProperty("keyPassword")
-            storeFile = keystoreProperties.getProperty("storeFile")
-                ?.let { rootProject.file(it) }
-            storePassword = keystoreProperties.getProperty("storePassword")
-        }
-    }
-
     buildTypes {
         release {
-            signingConfig = signingConfigs.getByName("release")
+            signingConfig = signingConfigs.getByName("debug")
         }
     }
 }
