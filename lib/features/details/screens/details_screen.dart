@@ -163,6 +163,10 @@ class _DetailsScreenState extends State<DetailsScreen> {
 
                 await _saveItems();
 
+                if (item == null) {
+                  await AdsService.recordLinkAdded();
+                }
+
                 if (!dialogContext.mounted) return;
                 Navigator.pop(dialogContext);
               },
