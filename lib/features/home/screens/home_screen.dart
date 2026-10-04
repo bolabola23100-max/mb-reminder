@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:mb_reminder/core/constants/app_icons.dart';
 import 'package:mb_reminder/core/theme/theme_controller.dart';
+import 'package:mb_reminder/core/widgets/banner_ad_widget.dart';
 import 'package:mb_reminder/features/instagram/screens/instagram_screen.dart';
 import 'package:mb_reminder/features/reminder/screens/reminder_screen.dart';
 import 'package:mb_reminder/features/tiktok/screens/tiktok_screen.dart';
@@ -29,7 +30,6 @@ class _HomeScreenState extends State<HomeScreen> {
     required String icon,
   }) {
     final colors = Theme.of(context).colorScheme;
-
     final isSelected = selectedIndex == index;
 
     return GestureDetector(
@@ -68,7 +68,6 @@ class _HomeScreenState extends State<HomeScreen> {
         title: const Text('MB Reminder'),
         centerTitle: true,
         elevation: 0,
-
         actions: [
           IconButton(
             onPressed: () {
@@ -85,27 +84,24 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ],
       ),
-
       body: Stack(
         children: [
           Padding(
-            padding: const EdgeInsets.only(bottom: 100),
+            padding: const EdgeInsets.only(bottom: 180),
             child: IndexedStack(index: selectedIndex, children: screens),
           ),
 
+          // Bottom navigation.
           Positioned(
-            bottom: 16,
+            bottom: 76,
             left: 16,
             right: 16,
-
             child: Container(
               height: 70,
-
               decoration: BoxDecoration(
                 color: colors.secondary,
                 borderRadius: BorderRadius.circular(35),
               ),
-
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
@@ -114,19 +110,16 @@ class _HomeScreenState extends State<HomeScreen> {
                     index: 0,
                     icon: AppIcons.youtube,
                   ),
-
                   _buildNavItem(
                     context: context,
                     index: 1,
                     icon: AppIcons.instagram,
                   ),
-
                   _buildNavItem(
                     context: context,
                     index: 2,
                     icon: AppIcons.tiktok,
                   ),
-
                   _buildNavItem(
                     context: context,
                     index: 3,
@@ -134,6 +127,16 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                 ],
               ),
+            ),
+          ),
+
+          // Banner is directly below the bottom navigation.
+          const Positioned(
+            bottom: 12,
+            left: 0,
+            right: 0,
+            child: Center(
+              child: BannerAdWidget(),
             ),
           ),
         ],
