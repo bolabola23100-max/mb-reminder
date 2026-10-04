@@ -8,11 +8,13 @@ class DetailsItem extends StatelessWidget {
     required this.items,
     required this.onEdit,
     required this.onDelete,
+    required this.onLinkOpened,
   });
 
   final List<DetailsModel> items;
   final ValueChanged<DetailsModel> onEdit;
   final ValueChanged<DetailsModel> onDelete;
+  final Future<void> Function() onLinkOpened;
 
   @override
   Widget build(BuildContext context) {
@@ -134,6 +136,10 @@ class DetailsItem extends StatelessWidget {
                                 content: Text('مش قادر أفتح اللينك'),
                               ),
                             );
+                          }
+
+                          if (launched) {
+                            await onLinkOpened();
                           }
                         } catch (_) {
                           if (!context.mounted) return;
