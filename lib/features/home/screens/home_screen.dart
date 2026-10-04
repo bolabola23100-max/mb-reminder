@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mb_reminder/core/constants/app_icons.dart';
 import 'package:mb_reminder/core/theme/theme_controller.dart';
-import 'package:mb_reminder/core/widgets/banner_ad_widget.dart';
 import 'package:mb_reminder/features/instagram/screens/instagram_screen.dart';
 import 'package:mb_reminder/features/reminder/screens/reminder_screen.dart';
 import 'package:mb_reminder/features/tiktok/screens/tiktok_screen.dart';
@@ -30,6 +29,7 @@ class _HomeScreenState extends State<HomeScreen> {
     required String icon,
   }) {
     final colors = Theme.of(context).colorScheme;
+
     final isSelected = selectedIndex == index;
 
     return GestureDetector(
@@ -87,13 +87,11 @@ class _HomeScreenState extends State<HomeScreen> {
       body: Stack(
         children: [
           Padding(
-            padding: const EdgeInsets.only(bottom: 180),
+            padding: const EdgeInsets.only(bottom: 100),
             child: IndexedStack(index: selectedIndex, children: screens),
           ),
-
-          // Bottom navigation.
           Positioned(
-            bottom: 76,
+            bottom: 16,
             left: 16,
             right: 16,
             child: Container(
@@ -127,16 +125,6 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                 ],
               ),
-            ),
-          ),
-
-          // Banner is directly below the bottom navigation.
-          const Positioned(
-            bottom: 12,
-            left: 0,
-            right: 0,
-            child: Center(
-              child: BannerAdWidget(),
             ),
           ),
         ],
