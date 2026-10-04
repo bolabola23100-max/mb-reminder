@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:mb_reminder/core/services/ads_service.dart';
 import 'package:mb_reminder/core/services/platform_detector.dart';
 import 'package:mb_reminder/core/services/reminder_storage.dart';
+import 'package:mb_reminder/core/widgets/banner_ad_widget.dart';
 import 'package:mb_reminder/core/widgets/details_item.dart';
 import 'package:mb_reminder/features/details/widgets/details_model.dart';
 import 'package:mb_reminder/features/folders/widgets/folder_model.dart';
@@ -51,7 +53,6 @@ class _DetailsScreenState extends State<DetailsScreen> {
     if (!mounted) return;
     setState(() => items = loaded);
 
-    // Saves generated IDs for old records so the migration is completed.
     await _saveItems();
   }
 
@@ -226,12 +227,20 @@ class _DetailsScreenState extends State<DetailsScreen> {
         items: items,
         onEdit: (item) => _showItemDialog(item: item),
         onDelete: _deleteItem,
+        onLinkOpened: AdsService.recordLinkOpened,
       ),
       floatingActionButton: FloatingActionButton(
         heroTag: 'items_${widget.folder.id}_fab',
         backgroundColor: colors.primary,
         onPressed: () => _showItemDialog(),
         child: Icon(Icons.add, color: colors.onPrimary),
+      ),
+      bottomNavigationBar: const SafeArea(
+        top: false,
+        child: Padding(
+          padding: EdgeInsets.only(bottom: 4),
+          child: BannerAdWidget(),
+        ),
       ),
     );
   }
