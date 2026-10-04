@@ -3,6 +3,7 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:mb_reminder/core/services/ads_service.dart';
 import 'package:mb_reminder/core/services/platform_detector.dart';
 import 'package:mb_reminder/core/theme/app_theme.dart';
 import 'package:mb_reminder/core/theme/theme_controller.dart';
@@ -19,6 +20,7 @@ Future<void> main() async {
   await Hive.initFlutter();
   await Hive.openBox('mb_reminder_box');
   await ThemeController.load();
+  await AdsService.initialize();
 
   final initialSharedText =
       await shareChannel.invokeMethod<String>('getSharedText');
