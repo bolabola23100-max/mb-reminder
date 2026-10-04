@@ -121,11 +121,9 @@ class AdsService {
 }
 
 class AdConfig {
-  // Google test IDs are used until the app has its own AdMob ad units.
-  // Replace these IDs with the real MB Reminder IDs before production.
   static const String bannerAdUnitId =
-      'ca-app-pub-3940256099942544/6300978111';
+      'ca-app-pub-9304585087563779/3214722166';
 
   static const String interstitialAdUnitId =
-      'ca-app-pub-3940256099942544/1033173712';
+      'ca-app-pub-9304585087563779/7828006168';
 }
