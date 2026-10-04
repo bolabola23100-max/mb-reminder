@@ -1,4 +1,4 @@
-package com.example.mb_reminder
+package com.bola.mbreminder
 
 import android.content.Intent
 import android.os.Bundle
