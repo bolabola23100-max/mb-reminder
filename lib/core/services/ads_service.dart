@@ -3,7 +3,7 @@ import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
 class AdsService {
-  static const bool adsEnabled = true;
+  static const bool adsEnabled = false;
 
   static const String _folderAddsKey = 'ads_folder_adds';
   static const String _linkAddsKey = 'ads_link_adds';
@@ -129,8 +129,7 @@ class AdsService {
 }
 
 class AdConfig {
-  static const String bannerAdUnitId =
-      'ca-app-pub-9304585087563779/3214722166';
+  static const String bannerAdUnitId = 'ca-app-pub-9304585087563779/3214722166';
 
   static const String interstitialAdUnitId =
       'ca-app-pub-9304585087563779/7828006168';
