@@ -16,22 +16,22 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
   static const _pages = [
     _OnboardingData(
-      icon: Icons.folder_copy_rounded,
+      image: 'assets/image/WhatsApp Image 2026-10-05 at 6.34.58 PM.jpeg',
       title: 'رتّب روابطك بسهولة',
       description:
-          'اعمل مجلدات مخصوصة لروابطك وخلي كل حاجة في مكانها بدل ما تدور عليها كل مرة.',
+          'اعمل مجلدات مخصوصة لروابطك وخلي كل حاجة مرتبة قدامك بدل ما تدور عليها كل مرة.',
     ),
     _OnboardingData(
-      icon: Icons.link_rounded,
+      image: 'assets/image/WhatsApp Image 2026-10-05 at 6.35.04 PM.jpeg',
       title: 'احفظ أي رابط بسرعة',
       description:
-          'احفظ روابط TikTok وYouTube وInstagram وغيرها، وكمان تقدر تبعت الرابط للتطبيق مباشرة من زر المشاركة.',
+          'احفظ روابط TikTok وYouTube وInstagram، وكمان ابعت أي رابط للتطبيق مباشرة من زر المشاركة.',
     ),
     _OnboardingData(
-      icon: Icons.rocket_launch_rounded,
-      title: 'وصل لروابطك في ثواني',
+      image: 'assets/image/WhatsApp Image 2026-10-05 at 6.35.05 PM.jpeg',
+      title: 'كل روابطك في مكان واحد',
       description:
-          'افتح روابطك وعدّلها أو احذفها بسهولة، وخلي كل روابطك المهمة معاك وقت ما تحتاجها.',
+          'افتح روابطك وعدّلها أو احذفها بسهولة، وخلّي كل الحاجات المهمة معاك وقت ما تحتاجها.',
     ),
   ];
 
@@ -52,8 +52,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     }
 
     _pageController.nextPage(
-      duration: const Duration(milliseconds: 300),
-      curve: Curves.easeOut,
+      duration: const Duration(milliseconds: 350),
+      curve: Curves.easeOutCubic,
     );
   }
 
@@ -70,14 +70,20 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     return Scaffold(
       body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.fromLTRB(24, 16, 24, 20),
+          padding: const EdgeInsets.fromLTRB(20, 10, 20, 20),
           child: Column(
             children: [
               Align(
                 alignment: AlignmentDirectional.centerEnd,
                 child: TextButton(
                   onPressed: _finish,
-                  child: const Text('تخطي'),
+                  child: Text(
+                    'تخطي',
+                    style: TextStyle(
+                      color: colors.onSurface.withValues(alpha: .65),
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
                 ),
               ),
               Expanded(
@@ -92,30 +98,41 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                     return Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Container(
-                          height: 190,
-                          width: 190,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: colors.primary.withValues(alpha: .12),
-                          ),
+                        Expanded(
                           child: Center(
                             child: Container(
-                              height: 120,
-                              width: 120,
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(36),
-                                color: colors.primary,
+                              constraints: const BoxConstraints(
+                                maxWidth: 330,
+                                maxHeight: 430,
                               ),
-                              child: Icon(
-                                page.icon,
-                                size: 58,
-                                color: colors.onPrimary,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(28),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: colors.shadow.withValues(alpha: .12),
+                                    blurRadius: 28,
+                                    offset: const Offset(0, 12),
+                                  ),
+                                ],
+                              ),
+                              clipBehavior: Clip.antiAlias,
+                              child: Image.asset(
+                                page.image,
+                                fit: BoxFit.contain,
+                                errorBuilder: (_, _, _) => Container(
+                                  color: colors.surfaceContainerHighest,
+                                  alignment: Alignment.center,
+                                  child: Icon(
+                                    Icons.image_not_supported_outlined,
+                                    size: 64,
+                                    color: colors.onSurfaceVariant,
+                                  ),
+                                ),
                               ),
                             ),
                           ),
                         ),
-                        const SizedBox(height: 44),
+                        const SizedBox(height: 26),
                         Text(
                           page.title,
                           textAlign: TextAlign.center,
@@ -123,13 +140,13 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                                 fontWeight: FontWeight.w800,
                               ),
                         ),
-                        const SizedBox(height: 16),
+                        const SizedBox(height: 10),
                         Text(
                           page.description,
                           textAlign: TextAlign.center,
-                          style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                                height: 1.6,
-                                color: colors.onSurface.withValues(alpha: .7),
+                          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                height: 1.55,
+                                color: colors.onSurface.withValues(alpha: .68),
                               ),
                         ),
                       ],
@@ -137,25 +154,26 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   },
                 ),
               ),
+              const SizedBox(height: 14),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: List.generate(
                   _pages.length,
                   (index) => AnimatedContainer(
-                    duration: const Duration(milliseconds: 200),
+                    duration: const Duration(milliseconds: 220),
                     margin: const EdgeInsets.symmetric(horizontal: 4),
-                    height: 8,
-                    width: index == _currentPage ? 26 : 8,
+                    height: 7,
+                    width: index == _currentPage ? 28 : 7,
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(20),
                       color: index == _currentPage
                           ? colors.primary
-                          : colors.onSurface.withValues(alpha: .2),
+                          : colors.onSurface.withValues(alpha: .18),
                     ),
                   ),
                 ),
               ),
-              const SizedBox(height: 24),
+              const SizedBox(height: 20),
               SizedBox(
                 width: double.infinity,
                 height: 54,
@@ -176,12 +194,12 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 }
 
 class _OnboardingData {
-  final IconData icon;
+  final String image;
   final String title;
   final String description;
 
   const _OnboardingData({
-    required this.icon,
+    required this.image,
     required this.title,
     required this.description,
   });
