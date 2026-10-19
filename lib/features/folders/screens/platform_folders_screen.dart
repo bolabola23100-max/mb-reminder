@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:mb_reminder/core/services/ads_service.dart';
 import 'package:mb_reminder/core/services/platform_detector.dart';
 import 'package:mb_reminder/core/services/reminder_storage.dart';
-import 'package:mb_reminder/core/widgets/banner_ad_widget.dart';
 import 'package:mb_reminder/core/widgets/card_widget.dart';
 import 'package:mb_reminder/features/details/screens/details_screen.dart';
 import 'package:mb_reminder/features/folders/widgets/folder_model.dart';
@@ -253,13 +252,6 @@ class _PlatformFoldersScreenState extends State<PlatformFoldersScreen> {
         backgroundColor: colors.primary,
         onPressed: _addFolder,
         child: Icon(Icons.add, color: colors.onPrimary),
-      ),
-      bottomNavigationBar: const SafeArea(
-        top: false,
-        child: Padding(
-          padding: EdgeInsets.only(bottom: 4),
-          child: BannerAdWidget(),
-        ),
       ),
     );
   }
