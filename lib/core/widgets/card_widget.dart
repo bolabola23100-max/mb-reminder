@@ -7,6 +7,8 @@ class CardWidget extends StatelessWidget {
   final ValueChanged<int> onTap;
   final ValueChanged<int>? onLongPress;
   final List<FolderModel> items;
+  final bool shrinkWrap;
+  final ScrollPhysics? physics;
 
   const CardWidget({
     super.key,
@@ -14,6 +16,8 @@ class CardWidget extends StatelessWidget {
     required this.onTap,
     required this.items,
     this.onLongPress,
+    this.shrinkWrap = false,
+    this.physics,
   });
 
   @override
@@ -21,7 +25,9 @@ class CardWidget extends StatelessWidget {
     final colors = Theme.of(context).colorScheme;
 
     return GridView.builder(
-      padding: const EdgeInsets.only(bottom: 100),
+      shrinkWrap: shrinkWrap,
+      physics: physics,
+      padding: const EdgeInsets.only(bottom: 16),
       gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
         maxCrossAxisExtent: 220,
         mainAxisExtent: 125,
