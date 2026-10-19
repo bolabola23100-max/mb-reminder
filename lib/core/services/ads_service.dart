@@ -18,6 +18,7 @@ class AdsService {
   static const Duration _cooldown = Duration(minutes: 3);
 
   static bool _initialized = false;
+  static final ValueNotifier<bool> initializationNotifier = ValueNotifier(false);
   static bool _initializationStarted = false;
   static bool _loadingInterstitial = false;
   static bool _interstitialLoaded = false;
@@ -37,11 +38,13 @@ class AdsService {
       testMode: false,
       onComplete: () {
         _initialized = true;
+        initializationNotifier.value = true;
         debugPrint('Unity Ads initialized for Android (production mode).');
         _loadInterstitial();
       },
       onFailed: (error, message) {
         _initialized = false;
+        initializationNotifier.value = false;
         _initializationStarted = false;
         debugPrint('Unity Ads initialization failed: $error - $message');
       },
