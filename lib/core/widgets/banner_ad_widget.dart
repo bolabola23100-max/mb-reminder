@@ -1,62 +1,32 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:google_mobile_ads/google_mobile_ads.dart';
-
 import 'package:mb_reminder/core/services/ads_service.dart';
+import 'package:unity_ads_plugin/unity_ads_plugin.dart';
 
-class BannerAdWidget extends StatefulWidget {
+class BannerAdWidget extends StatelessWidget {
   const BannerAdWidget({super.key});
 
   @override
-  State<BannerAdWidget> createState() => _BannerAdWidgetState();
-}
-
-class _BannerAdWidgetState extends State<BannerAdWidget> {
-  BannerAd? _bannerAd;
-
-  @override
-  void initState() {
-    super.initState();
-
-    if (!AdsService.adsEnabled) return;
-
-    final ad = BannerAd(
-      adUnitId: AdConfig.bannerAdUnitId,
-      request: const AdRequest(),
-      size: AdSize.banner,
-      listener: BannerAdListener(
-        onAdLoaded: (ad) {
-          if (!mounted) {
-            ad.dispose();
-            return;
-          }
-          setState(() => _bannerAd = ad as BannerAd);
-        },
-        onAdFailedToLoad: (ad, error) {
-          ad.dispose();
-        },
-      ),
-    );
-
-    ad.load();
-  }
-
-  @override
-  void dispose() {
-    _bannerAd?.dispose();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
-    if (!AdsService.adsEnabled) return const SizedBox.shrink();
+    if (!AdsService.adsEnabled ||
+        defaultTargetPlatform != TargetPlatform.android) {
+      return const SizedBox.shrink();
+    }
 
-    final ad = _bannerAd;
-    if (ad == null) return const SizedBox.shrink();
-
-    return SizedBox(
-      width: ad.size.width.toDouble(),
-      height: ad.size.height.toDouble(),
-      child: AdWidget(ad: ad),
+    return UnityBannerAd(
+      placementId: AdsService.bannerAdUnitId,
+      onLoad: (placementId) {
+        debugPrint('Unity banner loaded: $placementId');
+      },
+      onClick: (placementId) {
+        debugPrint('Unity banner clicked: $placementId');
+      },
+      onShown: (placementId) {
+        debugPrint('Unity banner shown: $placementId');
+      },
+      onFailed: (placementId, error, message) {
+        debugPrint('Unity banner failed: $error - $message');
+      },
     );
   }
 }
