@@ -7,8 +7,8 @@ class AdsService {
 
   // Android only. Keep testMode enabled while validating the integration.
   static const String _androidGameId = '6208907';
-  static const String bannerAdUnitId = 'mb_banner';
-  static const String interstitialAdUnitId = 'mb_Interstitial';
+  static const String bannerAdUnitId = 'Banner_Android';
+  static const String interstitialAdUnitId = 'Interstitial_Android';
 
   static const String _folderAddsKey = 'ads_folder_adds';
   static const String _linkAddsKey = 'ads_link_adds';
