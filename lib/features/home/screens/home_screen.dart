@@ -134,8 +134,11 @@ class _HomeScreenState extends State<HomeScreen> {
             right: 0,
             child: SafeArea(
               top: false,
-              child: Center(
-                child: BannerAdWidget(),
+              child: SizedBox(
+                height: 50,
+                child: Center(
+                  child: BannerAdWidget(),
+                ),
               ),
             ),
           ),
