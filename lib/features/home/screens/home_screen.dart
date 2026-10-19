@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:mb_reminder/core/constants/app_icons.dart';
 import 'package:mb_reminder/core/theme/theme_controller.dart';
+import 'package:mb_reminder/core/widgets/banner_ad_widget.dart';
 import 'package:mb_reminder/features/instagram/screens/instagram_screen.dart';
 import 'package:mb_reminder/features/reminder/screens/reminder_screen.dart';
 import 'package:mb_reminder/features/tiktok/screens/tiktok_screen.dart';
@@ -29,7 +30,6 @@ class _HomeScreenState extends State<HomeScreen> {
     required String icon,
   }) {
     final colors = Theme.of(context).colorScheme;
-
     final isSelected = selectedIndex == index;
 
     return GestureDetector(
@@ -87,11 +87,13 @@ class _HomeScreenState extends State<HomeScreen> {
       body: Stack(
         children: [
           Padding(
-            padding: const EdgeInsets.only(bottom: 100),
+            // Keep screen content clear of both the navigation bar and banner.
+            padding: const EdgeInsets.only(bottom: 160),
             child: IndexedStack(index: selectedIndex, children: screens),
           ),
           Positioned(
-            bottom: 16,
+            // Lift the navigation bar above the banner ad.
+            bottom: 70,
             left: 16,
             right: 16,
             child: Container(
@@ -124,6 +126,17 @@ class _HomeScreenState extends State<HomeScreen> {
                     icon: AppIcons.reminder,
                   ),
                 ],
+              ),
+            ),
+          ),
+          const Positioned(
+            bottom: 0,
+            left: 0,
+            right: 0,
+            child: SafeArea(
+              top: false,
+              child: Center(
+                child: BannerAdWidget(),
               ),
             ),
           ),
