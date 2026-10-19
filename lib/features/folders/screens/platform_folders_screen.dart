@@ -257,6 +257,8 @@ class _PlatformFoldersScreenState extends State<PlatformFoldersScreen> {
                 child: CardWidget(
                   icons: icon,
                   items: folders,
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
                   onTap: (index) => _openFolder(folders[index]),
                   onLongPress: (index) => _showFolderMenu(folders[index]),
                 ),
