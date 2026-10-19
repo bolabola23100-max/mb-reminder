@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:mb_reminder/core/services/ads_service.dart';
 import 'package:mb_reminder/core/services/platform_detector.dart';
 import 'package:mb_reminder/core/services/reminder_storage.dart';
-import 'package:mb_reminder/core/widgets/banner_ad_widget.dart';
 import 'package:mb_reminder/core/widgets/details_item.dart';
 import 'package:mb_reminder/features/details/widgets/details_model.dart';
 import 'package:mb_reminder/features/folders/widgets/folder_model.dart';
@@ -238,13 +237,6 @@ class _DetailsScreenState extends State<DetailsScreen> {
         backgroundColor: colors.primary,
         onPressed: () => _showItemDialog(),
         child: Icon(Icons.add, color: colors.onPrimary),
-      ),
-      bottomNavigationBar: const SafeArea(
-        top: false,
-        child: Padding(
-          padding: EdgeInsets.only(bottom: 4),
-          child: BannerAdWidget(),
-        ),
       ),
     );
   }
