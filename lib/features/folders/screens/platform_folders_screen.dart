@@ -122,7 +122,8 @@ class _PlatformFoldersScreenState extends State<PlatformFoldersScreen> {
     if (cleanName.isEmpty) return;
 
     final duplicate = folders.any(
-      (item) => item.id != folder.id &&
+      (item) =>
+          item.id != folder.id &&
           item.name.toLowerCase() == cleanName.toLowerCase(),
     );
     if (duplicate) {
@@ -239,7 +240,7 @@ class _PlatformFoldersScreenState extends State<PlatformFoldersScreen> {
               ),
             )
           : Padding(
-              padding: const EdgeInsets.fromLTRB(10, 10, 10, 60),
+              padding: const EdgeInsets.fromLTRB(10, 10, 10, 10),
               child: CardWidget(
                 icons: icon,
                 items: folders,
@@ -247,9 +248,11 @@ class _PlatformFoldersScreenState extends State<PlatformFoldersScreen> {
                 onLongPress: (index) => _showFolderMenu(folders[index]),
               ),
             ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
       floatingActionButton: FloatingActionButton(
         heroTag: 'folder_${widget.platform.storageKey}_fab',
         backgroundColor: colors.primary,
+        elevation: 6,
         onPressed: _addFolder,
         child: Icon(Icons.add, color: colors.onPrimary),
       ),
