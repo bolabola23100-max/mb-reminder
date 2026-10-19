@@ -86,9 +86,9 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       body: Stack(
         children: [
-          Padding(
-            // Keep screen content clear of both the navigation bar and banner.
-            padding: const EdgeInsets.only(bottom: 160),
+          // Let page content extend behind the floating navigation bar,
+          // so its translucent background reveals the content underneath.
+          Positioned.fill(
             child: IndexedStack(index: selectedIndex, children: screens),
           ),
           Positioned(
@@ -99,7 +99,7 @@ class _HomeScreenState extends State<HomeScreen> {
             child: Container(
               height: 70,
               decoration: BoxDecoration(
-                color: colors.secondary.withValues(alpha: 0.55),
+                color: colors.secondary.withValues(alpha: 0.18),
                 borderRadius: BorderRadius.circular(35),
               ),
               child: Row(
