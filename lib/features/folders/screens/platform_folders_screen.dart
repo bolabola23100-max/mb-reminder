@@ -227,27 +227,44 @@ class _PlatformFoldersScreenState extends State<PlatformFoldersScreen> {
     final colors = Theme.of(context).colorScheme;
 
     return Scaffold(
-      appBar: AppBar(title: Text(title), centerTitle: true),
-      body: folders.isEmpty
-          ? Center(
-              child: Text(
-                'مفيش ملفات لسه\nاضغط + واعمل أول ملف',
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  color: colors.onSurface.withValues(alpha: .65),
-                  fontSize: 16,
+      body: CustomScrollView(
+        slivers: [
+          SliverAppBar(
+            title: Text(title),
+            centerTitle: true,
+            floating: true,
+            snap: true,
+          ),
+          if (folders.isEmpty)
+            SliverFillRemaining(
+              hasScrollBody: false,
+              child: Center(
+                child: Text(
+                  'مفيش ملفات لسه\nاضغط + واعمل أول ملف',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: colors.onSurface.withValues(alpha: .65),
+                    fontSize: 16,
+                  ),
                 ),
               ),
             )
-          : Padding(
-              padding: const EdgeInsets.fromLTRB(10, 10, 10, 10),
-              child: CardWidget(
-                icons: icon,
-                items: folders,
-                onTap: (index) => _openFolder(folders[index]),
-                onLongPress: (index) => _showFolderMenu(folders[index]),
+          else
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsets.all(10),
+                child: CardWidget(
+                  icons: icon,
+                  items: folders,
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  onTap: (index) => _openFolder(folders[index]),
+                  onLongPress: (index) => _showFolderMenu(folders[index]),
+                ),
               ),
             ),
+        ],
+      ),
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
       floatingActionButton: FloatingActionButton(
         heroTag: 'folder_${widget.platform.storageKey}_fab',
