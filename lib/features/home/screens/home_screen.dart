@@ -86,8 +86,7 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       body: Stack(
         children: [
-          // Let page content extend behind the floating navigation bar,
-          // so its translucent background reveals the content underneath.
+          // Keep page content behind the floating navigation bar, while the bar itself remains opaque.
           Positioned.fill(
             child: IndexedStack(index: selectedIndex, children: screens),
           ),
@@ -99,7 +98,7 @@ class _HomeScreenState extends State<HomeScreen> {
             child: Container(
               height: 70,
               decoration: BoxDecoration(
-                color: colors.secondary.withValues(alpha: 0.18),
+                color: colors.secondary,
                 borderRadius: BorderRadius.circular(35),
               ),
               child: Row(
