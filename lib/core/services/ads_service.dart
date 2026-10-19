@@ -5,7 +5,7 @@ import 'package:unity_ads_plugin/unity_ads_plugin.dart';
 class AdsService {
   static const bool adsEnabled = true;
 
-  // Android only. Keep testMode enabled while validating the integration.
+  // Production Android configuration. Ads still depend on Unity dashboard approval/fill.
   static const String _androidGameId = '6208907';
   static const String bannerAdUnitId = 'Banner_Android';
   static const String interstitialAdUnitId = 'Interstitial_Android';
@@ -34,10 +34,10 @@ class AdsService {
     _initializationStarted = true;
     UnityAds.init(
       gameId: _androidGameId,
-      testMode: true,
+      testMode: false,
       onComplete: () {
         _initialized = true;
-        debugPrint('Unity Ads initialized for Android.');
+        debugPrint('Unity Ads initialized for Android (production mode).');
         _loadInterstitial();
       },
       onFailed: (error, message) {
