@@ -13,19 +13,28 @@ class BannerAdWidget extends StatelessWidget {
       return const SizedBox.shrink();
     }
 
-    return UnityBannerAd(
-      placementId: AdsService.bannerAdUnitId,
-      onLoad: (placementId) {
-        debugPrint('Unity banner loaded: $placementId');
-      },
-      onClick: (placementId) {
-        debugPrint('Unity banner clicked: $placementId');
-      },
-      onShown: (placementId) {
-        debugPrint('Unity banner shown: $placementId');
-      },
-      onFailed: (placementId, error, message) {
-        debugPrint('Unity banner failed: $error - $message');
+    // Do not create the native banner before Unity Ads has initialized.
+    // The notifier rebuilds this widget as soon as initialization succeeds.
+    return ValueListenableBuilder<bool>(
+      valueListenable: AdsService.initializationNotifier,
+      builder: (context, initialized, child) {
+        if (!initialized) return const SizedBox.shrink();
+
+        return UnityBannerAd(
+          placementId: AdsService.bannerAdUnitId,
+          onLoad: (placementId) {
+            debugPrint('Unity banner loaded: $placementId');
+          },
+          onClick: (placementId) {
+            debugPrint('Unity banner clicked: $placementId');
+          },
+          onShown: (placementId) {
+            debugPrint('Unity banner shown: $placementId');
+          },
+          onFailed: (placementId, error, message) {
+            debugPrint('Unity banner failed: $error - $message');
+          },
+        );
       },
     );
   }
