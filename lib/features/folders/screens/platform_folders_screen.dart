@@ -267,12 +267,15 @@ class _PlatformFoldersScreenState extends State<PlatformFoldersScreen> {
         ],
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
-      floatingActionButton: FloatingActionButton(
-        heroTag: 'folder_${widget.platform.storageKey}_fab',
-        backgroundColor: colors.primary,
-        elevation: 6,
-        onPressed: _addFolder,
-        child: Icon(Icons.add, color: colors.onPrimary),
+      floatingActionButton: Padding(
+        padding: const EdgeInsets.only(bottom: 140),
+        child: FloatingActionButton(
+          heroTag: 'folder_${widget.platform.storageKey}_fab',
+          backgroundColor: colors.primary,
+          elevation: 6,
+          onPressed: _addFolder,
+          child: Icon(Icons.add, color: colors.onPrimary),
+        ),
       ),
     );
   }
