@@ -229,8 +229,6 @@ class _PlatformFoldersScreenState extends State<PlatformFoldersScreen> {
     return Scaffold(
       body: CustomScrollView(
         slivers: [
-          // Hide the platform AppBar while scrolling down and reveal it
-          // immediately when the user scrolls back up.
           SliverAppBar(
             title: Text(title),
             centerTitle: true,
@@ -253,14 +251,12 @@ class _PlatformFoldersScreenState extends State<PlatformFoldersScreen> {
               ),
             )
           else
-            SliverToBoxAdapter(
-              child: Padding(
-                padding: const EdgeInsets.all(10),
+            SliverPadding(
+              padding: const EdgeInsets.fromLTRB(10, 10, 10, 10),
+              sliver: SliverToBoxAdapter(
                 child: CardWidget(
                   icons: icon,
                   items: folders,
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
                   onTap: (index) => _openFolder(folders[index]),
                   onLongPress: (index) => _showFolderMenu(folders[index]),
                 ),
@@ -270,7 +266,7 @@ class _PlatformFoldersScreenState extends State<PlatformFoldersScreen> {
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
       floatingActionButton: FloatingActionButton(
-        heroTag: 'folder_${widget.platform.storageKey}_fab',
+        heroTag: 'folder*${widget.platform.storageKey}_fab',
         backgroundColor: colors.primary,
         elevation: 6,
         onPressed: _addFolder,
