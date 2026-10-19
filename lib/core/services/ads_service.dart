@@ -1,9 +1,14 @@
 import 'package:flutter/foundation.dart';
-import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:unity_ads_plugin/unity_ads_plugin.dart';
 
 class AdsService {
-  static const bool adsEnabled = false;
+  static const bool adsEnabled = true;
+
+  // Android only. Keep testMode enabled while validating the integration.
+  static const String _androidGameId = '6208907';
+  static const String bannerAdUnitId = 'mb_banner';
+  static const String interstitialAdUnitId = 'mb_Interstitial';
 
   static const String _folderAddsKey = 'ads_folder_adds';
   static const String _linkAddsKey = 'ads_link_adds';
@@ -12,44 +17,73 @@ class AdsService {
   static const int _triggerEvery = 4;
   static const Duration _cooldown = Duration(minutes: 3);
 
-  static InterstitialAd? _interstitialAd;
   static bool _initialized = false;
+  static bool _initializationStarted = false;
   static bool _loadingInterstitial = false;
+  static bool _interstitialLoaded = false;
+  static bool _showingInterstitial = false;
+  static String? _pendingTriggerKey;
 
   static Future<void> initialize() async {
-    if (!adsEnabled || _initialized) return;
-    _initialized = true;
+    if (!adsEnabled ||
+        defaultTargetPlatform != TargetPlatform.android ||
+        _initializationStarted) {
+      return;
+    }
 
-    await MobileAds.instance.initialize();
-    _loadInterstitial();
+    _initializationStarted = true;
+    UnityAds.init(
+      gameId: _androidGameId,
+      testMode: true,
+      onComplete: () {
+        _initialized = true;
+        debugPrint('Unity Ads initialized for Android.');
+        _loadInterstitial();
+      },
+      onFailed: (error, message) {
+        _initialized = false;
+        _initializationStarted = false;
+        debugPrint('Unity Ads initialization failed: $error - $message');
+      },
+    );
   }
 
   static Box get _box => Hive.box('mb_reminder_box');
 
   static Future<void> recordFolderAdded() async {
-    if (!adsEnabled) return;
     await _record(_folderAddsKey);
   }
 
   static Future<void> recordLinkAdded() async {
-    if (!adsEnabled) return;
     await _record(_linkAddsKey);
   }
 
   static Future<void> recordLinkOpened() async {
-    if (!adsEnabled) return;
     await _record(_linkOpensKey);
   }
 
   static Future<void> _record(String key) async {
-    if (!adsEnabled) return;
+    if (!adsEnabled ||
+        defaultTargetPlatform != TargetPlatform.android ||
+        !_initialized) {
+      return;
+    }
+
     final count = (_box.get(key, defaultValue: 0) as int) + 1;
     await _box.put(key, count);
     await _tryShowFor(key, count);
   }
 
   static Future<void> _tryShowFor(String key, int count) async {
-    if (!adsEnabled || count < _triggerEvery) return;
+    if (!_initialized ||
+        !_interstitialLoaded ||
+        _showingInterstitial ||
+        count < _triggerEvery) {
+      if (_initialized && !_interstitialLoaded) {
+        _loadInterstitial();
+      }
+      return;
+    }
 
     final lastShown = _box.get(_lastInterstitialKey);
     if (lastShown is int) {
@@ -59,78 +93,68 @@ class AdsService {
       if (elapsed < _cooldown) return;
     }
 
-    final ad = _interstitialAd;
-    if (ad == null) {
-      _loadInterstitial();
-      return;
-    }
+    _showingInterstitial = true;
+    _interstitialLoaded = false;
+    _pendingTriggerKey = key;
 
-    _interstitialAd = null;
-    var shown = false;
-
-    ad.fullScreenContentCallback = FullScreenContentCallback(
-      onAdShowedFullScreenContent: (_) async {
-        shown = true;
+    UnityAds.showVideoAd(
+      placementId: interstitialAdUnitId,
+      onStart: (placementId) async {
         await _box.put(
           _lastInterstitialKey,
           DateTime.now().millisecondsSinceEpoch,
         );
-        await _box.put(key, 0);
-      },
-      onAdDismissedFullScreenContent: (ad) {
-        ad.dispose();
-        _loadInterstitial();
-      },
-      onAdFailedToShowFullScreenContent: (ad, error) {
-        debugPrint('Interstitial failed to show: $error');
-        ad.dispose();
-        if (!shown) {
-          _loadInterstitial();
+        final triggerKey = _pendingTriggerKey;
+        if (triggerKey != null) {
+          await _box.put(triggerKey, 0);
         }
       },
+      onClick: (placementId) {
+        debugPrint('Unity interstitial clicked: $placementId');
+      },
+      onComplete: (placementId) {
+        _finishInterstitial();
+      },
+      onSkipped: (placementId) {
+        _finishInterstitial();
+      },
+      onFailed: (placementId, error, message) {
+        debugPrint('Unity interstitial failed: $error - $message');
+        _finishInterstitial();
+      },
     );
+  }
 
-    try {
-      await ad.show();
-    } catch (error) {
-      debugPrint('Interstitial show error: $error');
-      ad.dispose();
-      _loadInterstitial();
-    }
+  static void _finishInterstitial() {
+    _showingInterstitial = false;
+    _pendingTriggerKey = null;
+    _loadInterstitial();
   }
 
   static void _loadInterstitial() {
-    if (!adsEnabled || _loadingInterstitial || _interstitialAd != null) {
-      return;
-    }
-    _loadingInterstitial = true;
+    if (!_initialized || _loadingInterstitial || _interstitialLoaded) return;
 
-    InterstitialAd.load(
-      adUnitId: AdConfig.interstitialAdUnitId,
-      request: const AdRequest(),
-      adLoadCallback: InterstitialAdLoadCallback(
-        onAdLoaded: (ad) {
-          _loadingInterstitial = false;
-          _interstitialAd = ad;
-        },
-        onAdFailedToLoad: (error) {
-          _loadingInterstitial = false;
-          debugPrint('Interstitial failed to load: $error');
-        },
-      ),
+    _loadingInterstitial = true;
+    UnityAds.load(
+      placementId: interstitialAdUnitId,
+      onComplete: (placementId) {
+        _loadingInterstitial = false;
+        _interstitialLoaded = true;
+        debugPrint('Unity interstitial loaded: $placementId');
+      },
+      onFailed: (placementId, error, message) {
+        _loadingInterstitial = false;
+        _interstitialLoaded = false;
+        debugPrint('Unity interstitial load failed: $error - $message');
+      },
     );
   }
 
   static void dispose() {
-    _interstitialAd?.dispose();
-    _interstitialAd = null;
+    // UnityAds is managed by its SDK; do not dispose the global SDK here.
+    _interstitialLoaded = false;
     _loadingInterstitial = false;
+    _showingInterstitial = false;
+    _pendingTriggerKey = null;
   }
-}
-
-class AdConfig {
-  static const String bannerAdUnitId = 'ca-app-pub-9304585087563779/3214722166';
-
-  static const String interstitialAdUnitId =
-      'ca-app-pub-9304585087563779/7828006168';
 }
