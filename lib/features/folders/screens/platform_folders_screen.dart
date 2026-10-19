@@ -266,7 +266,7 @@ class _PlatformFoldersScreenState extends State<PlatformFoldersScreen> {
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
       floatingActionButton: FloatingActionButton(
-        heroTag: 'folder*${widget.platform.storageKey}_fab',
+        heroTag: 'folder_${widget.platform.storageKey}_fab',
         backgroundColor: colors.primary,
         elevation: 6,
         onPressed: _addFolder,
