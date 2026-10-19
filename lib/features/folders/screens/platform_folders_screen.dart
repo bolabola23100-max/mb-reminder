@@ -229,9 +229,12 @@ class _PlatformFoldersScreenState extends State<PlatformFoldersScreen> {
     return Scaffold(
       body: CustomScrollView(
         slivers: [
+          // Hide the platform AppBar while scrolling down and reveal it
+          // immediately when the user scrolls back up.
           SliverAppBar(
             title: Text(title),
             centerTitle: true,
+            pinned: false,
             floating: true,
             snap: true,
           ),
